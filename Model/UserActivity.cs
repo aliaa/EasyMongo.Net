@@ -9,7 +9,7 @@ namespace EasyMongoNet.Model
     [CollectionOptions(Name = "ActivityLogs", Capped = true, MaxSize = 10000000)]
     [CollectionSave(WriteLog = false, Preprocess = false)]
     [BsonKnownTypes(typeof(DeleteActivity), typeof(InsertActivity), typeof(UpdateActivity))]
-    internal abstract class UserActivity : MongoEntity
+    public abstract class UserActivity : MongoEntity
     {
         public string Username { get; set; }
 
