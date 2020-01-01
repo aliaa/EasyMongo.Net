@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace EasyMongoNet
 {
@@ -29,7 +30,7 @@ namespace EasyMongoNet
         public bool DefaultPreprocess { get; set; } = false;
 
         public MongoDbContext(string dbName, string connectionString, 
-            Func<string> getUsernameFunc,
+            Func<string> getUsernameFunc = null,
             bool setDictionaryConventionToArrayOfDocuments = false, 
             IEnumerable<CustomMongoConnection> customConnections = null, 
             IObjectSavePreprocessor objectPreprocessor = null)
@@ -136,7 +137,7 @@ namespace EasyMongoNet
                 return SaveAttrsCache[type];
             var attr = (CollectionSaveAttribute)Attribute.GetCustomAttribute(type, typeof(CollectionSaveAttribute));
             if (attr != null)
-                SaveAttrsCache[type] = attr;
+                SaveAttrsCache.Add(type, attr);
             return attr;
         }
 
@@ -320,6 +321,16 @@ namespace EasyMongoNet
         public IMongoQueryable<T> AsQueryable<T>(AggregateOptions options = null) where T : IMongoEntity
         {
             return GetCollection<T>().AsQueryable(options);
+        }
+
+        public void InsertMany<T>(IEnumerable<T> items, InsertManyOptions options = null) where T : IMongoEntity
+        {
+            GetCollection<T>().InsertMany(items, options);
+        }
+
+        public Task InsertManyAsync<T>(IEnumerable<T> items, InsertManyOptions options = null) where T : IMongoEntity
+        {
+            return GetCollection<T>().InsertManyAsync(items, options);
         }
     }
 }

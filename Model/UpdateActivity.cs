@@ -23,7 +23,12 @@ namespace EasyMongoNet.Model
             {
                 object oldVal = prop.GetValue(oldObj);
                 object newVal = prop.GetValue(newObj);
-                bool areEqual = (newVal == oldVal);
+                bool areEqual;
+                if (oldVal == null)
+                    areEqual = (newVal == null);
+                else
+                    areEqual = oldVal.Equals(newVal);
+
                 if (!areEqual && oldVal != null && newVal != null && !(newVal is string) && (newVal is IEnumerable))
                 {
                     areEqual = true;

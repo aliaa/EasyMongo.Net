@@ -4,6 +4,7 @@ using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace EasyMongoNet
 {
@@ -28,5 +29,7 @@ namespace EasyMongoNet
         long Count<T>(FilterDefinition<T> filter, CountOptions options = null) where T : IMongoEntity;
         IAggregateFluent<T> Aggregate<T>(AggregateOptions options = null) where T : IMongoEntity;
         IMongoQueryable<T> AsQueryable<T>(AggregateOptions options = null) where T : IMongoEntity;
+        void InsertMany<T>(IEnumerable<T> items, InsertManyOptions options = null) where T : IMongoEntity;
+        Task InsertManyAsync<T>(IEnumerable<T> items, InsertManyOptions options = null) where T : IMongoEntity;
     }
 }
