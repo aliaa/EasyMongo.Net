@@ -24,6 +24,8 @@ namespace EasyMongoNet
         bool Any<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
         IFindFluent<T, T> Find<T>(Expression<Func<T, bool>> filter, FindOptions options = null) where T : IMongoEntity;
         IFindFluent<T, T> Find<T>(FilterDefinition<T> filter, FindOptions options = null) where T : IMongoEntity;
+        T FindFirst<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
+        IEnumerable<T> FindGetResults<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
         long Count<T>() where T : IMongoEntity;
         long Count<T>(Expression<Func<T, bool>> filter, CountOptions options = null) where T : IMongoEntity;
         long Count<T>(FilterDefinition<T> filter, CountOptions options = null) where T : IMongoEntity;

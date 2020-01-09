@@ -160,6 +160,16 @@ namespace EasyMongoNet
             return FindById<T>(ObjectId.Parse(id));
         }
 
+        public T FindFirst<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity
+        {
+            return Find(filter).FirstOrDefault();
+        }
+
+        public IEnumerable<T> FindGetResults<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity
+        {
+            return Find(filter).ToEnumerable();
+        }
+
         public void Save<T>(T item) where T : IMongoEntity
         {
             bool writeLog = DefaultWriteLog;
