@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,6 @@ namespace EasyMongoNet
     {
         public string Type { get; set; }
         public string DBName { get; set; }
-        public string ConnectionString { get; set; }
+        public MongoClientSettings ConnectionSettings { get; set; }
     }
 }

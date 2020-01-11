@@ -17,7 +17,6 @@ namespace EasyMongoNet
     public class MongoDbContext : IDbContext
     {
         private readonly IObjectSavePreprocessor objectPreprocessor;
-        private readonly string connectionString;
         private readonly bool setDictionaryConventionToArrayOfDocuments;
         private readonly List<CustomMongoConnection> customConnections = new List<CustomMongoConnection>();
         private readonly Dictionary<string, object> Collections = new Dictionary<string, object>();
@@ -29,25 +28,29 @@ namespace EasyMongoNet
         public bool DefaultWriteLog { get; set; } = false;
         public bool DefaultPreprocess { get; set; } = false;
 
-        public MongoDbContext(string dbName, string connectionString, 
-            Func<string> getUsernameFunc = null,
-            bool setDictionaryConventionToArrayOfDocuments = false, 
-            IEnumerable<CustomMongoConnection> customConnections = null, 
-            IObjectSavePreprocessor objectPreprocessor = null)
+        public MongoDbContext(string dbName, MongoClientSettings mongoClientSettings, 
+            Func<string> getUsernameFunc = null, bool setDictionaryConventionToArrayOfDocuments = false, 
+            IEnumerable<CustomMongoConnection> customConnections = null, IObjectSavePreprocessor objectPreprocessor = null)
         {
             this.dbName = dbName;
-            this.connectionString = connectionString;
             this.getUsernameFunc = getUsernameFunc;
             this.setDictionaryConventionToArrayOfDocuments = setDictionaryConventionToArrayOfDocuments;
-            this.Database = GetDatabase(connectionString, dbName, setDictionaryConventionToArrayOfDocuments);
+            this.Database = GetDatabase(mongoClientSettings, dbName, setDictionaryConventionToArrayOfDocuments);
             if (customConnections != null)
                 this.customConnections.AddRange(customConnections);
             this.objectPreprocessor = objectPreprocessor;
         }
 
-        private IMongoDatabase GetDatabase(string connectionString, string dbName, bool setDictionaryConventionToArrayOfDocuments)
+        public MongoDbContext(string dbName, string connectionString,
+            Func<string> getUsernameFunc = null, bool setDictionaryConventionToArrayOfDocuments = false,
+            IEnumerable<CustomMongoConnection> customConnections = null, IObjectSavePreprocessor objectPreprocessor = null)
+            : this(dbName, MongoClientSettings.FromConnectionString(connectionString), 
+                getUsernameFunc, setDictionaryConventionToArrayOfDocuments, customConnections, objectPreprocessor)
+        { }
+
+        private static IMongoDatabase GetDatabase(MongoClientSettings mongoClientSettings, string dbName, bool setDictionaryConventionToArrayOfDocuments)
         {
-            MongoClient client = new MongoClient(connectionString);
+            MongoClient client = new MongoClient(mongoClientSettings);
             var db = client.GetDatabase(dbName);
 
             if (setDictionaryConventionToArrayOfDocuments)
@@ -67,11 +70,9 @@ namespace EasyMongoNet
                 return (IMongoCollection<T>)Collections[collectionName];
 
             IMongoCollection<T> collection;
-            CustomMongoConnection customConnection = customConnections.FirstOrDefault(c => c.Type == collectionName);
-            if (customConnection != null)
-            {
-                collection = GetCollection<T>(GetDatabase(customConnection.ConnectionString, customConnection.DBName, setDictionaryConventionToArrayOfDocuments));
-            }
+            var conn = customConnections.FirstOrDefault(c => c.Type == collectionName);
+            if (conn != null)
+                collection = GetCollection<T>(GetDatabase(conn.ConnectionSettings, conn.DBName, setDictionaryConventionToArrayOfDocuments));
             else
                 collection = GetCollection<T>(Database);
 
