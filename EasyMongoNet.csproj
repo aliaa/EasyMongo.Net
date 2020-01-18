@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Ali Aboutalebi</Authors>
+    <RepositoryUrl>https://github.com/aliaa/EasyMongo.Net</RepositoryUrl>
+    <Description>A MongoDB helper based on MongoDB C# driver library.</Description>
+    <PackageProjectUrl>https://github.com/aliaa/EasyMongo.Net</PackageProjectUrl>
+    <PackageId>EasyMongo.Net</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
