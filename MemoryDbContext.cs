@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace EasyMongoNet
 {
+    /// <summary>
+    /// A memory based implementation of IDbContext. Use this class as your database mock in your tests.
+    /// </summary>
     public class MemoryDbContext : IDbContext
     {
         public readonly Dictionary<Type, List<object>> Data = new Dictionary<Type, List<object>>();

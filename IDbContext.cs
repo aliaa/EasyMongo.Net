@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace EasyMongoNet
 {
+    /// <summary>
+    /// Main interface to interact with mongodb. Use this interface in all your interactions with database instead of directly inherited classes like <see cref="MongoDbContext"/>.
+    /// </summary>
     public interface IDbContext
     {
         T FindById<T>(ObjectId id) where T : IMongoEntity;

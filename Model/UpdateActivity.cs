@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace EasyMongoNet.Model
 {
+    /// <summary>
+    /// Represents a log to updating an object and holds the changed properties.
+    /// </summary>
     internal class UpdateActivity : UserActivity
     {
         public List<Variance> Diff { get; set; }

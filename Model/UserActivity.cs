@@ -6,6 +6,9 @@ using System.Text;
 
 namespace EasyMongoNet.Model
 {
+    /// <summary>
+    /// Base class to logging users activities on changing sensitive data containing 3 subclasses: <see cref="InsertActivity"/>, <see cref="UpdateActivity"/> and <see cref="DeleteActivity"/>.
+    /// </summary>
     [CollectionOptions(Name = "ActivityLogs", Capped = true, MaxSize = 10000000)]
     [CollectionSave(WriteLog = false, Preprocess = false)]
     [BsonKnownTypes(typeof(DeleteActivity), typeof(InsertActivity), typeof(UpdateActivity))]

@@ -4,6 +4,9 @@ using System;
 
 namespace EasyMongoNet
 {
+    /// <summary>
+    /// Use this as parameter to JsonConverter(..) attribute to make able Newtonsoft.Json library to serialize ObjectId types to json.
+    /// </summary>
     public class ObjectIdJsonConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

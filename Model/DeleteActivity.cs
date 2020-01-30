@@ -1,6 +1,9 @@
 ﻿
 namespace EasyMongoNet.Model
 {
+    /// <summary>
+    /// Represents a log to deleting job and holds a copy of deleted object.
+    /// </summary>
     internal class DeleteActivity : UserActivity
     {
         public DeleteActivity() : this(null) { }

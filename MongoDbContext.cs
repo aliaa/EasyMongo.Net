@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace EasyMongoNet
 {
+    /// <summary>
+    /// Main implementation of IDbContext. Use this class as your main definition of IDbContext.
+    /// </summary>
     public class MongoDbContext : IDbContext
     {
         private readonly IObjectSavePreprocessor objectPreprocessor;

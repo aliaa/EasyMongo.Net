@@ -7,6 +7,9 @@ using System.Text;
 
 namespace EasyMongoNet
 {
+    /// <summary>
+    /// Your models must implement this interface or inherited from <see cref="MongoEntity"/> class.
+    /// </summary>
     public interface IMongoEntity
     {
         [BsonId]
