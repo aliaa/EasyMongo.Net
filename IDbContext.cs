@@ -11,10 +11,8 @@ namespace EasyMongoNet
     /// <summary>
     /// Main interface to interact with mongodb. Use this interface in all your interactions with database instead of directly inherited classes like <see cref="MongoDbContext"/>.
     /// </summary>
-    public interface IDbContext
+    public interface IDbContext : IReadOnlyDbContext
     {
-        T FindById<T>(ObjectId id) where T : IMongoEntity;
-        T FindById<T>(string id) where T : IMongoEntity;
         void Save<T>(T item) where T : IMongoEntity;
         DeleteResult DeleteOne<T>(T item) where T : IMongoEntity;
         DeleteResult DeleteOne<T>(ObjectId id) where T : IMongoEntity;
@@ -23,17 +21,6 @@ namespace EasyMongoNet
         UpdateResult UpdateOne<T>(Expression<Func<T, bool>> filter, UpdateDefinition<T> updateDef, UpdateOptions options = null) where T : IMongoEntity;
         UpdateResult UpdateMany<T>(FilterDefinition<T> filter, UpdateDefinition<T> update, UpdateOptions options = null) where T : IMongoEntity;
         UpdateResult UpdateMany<T>(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, UpdateOptions options = null) where T : IMongoEntity;
-        IEnumerable<T> All<T>() where T : IMongoEntity;
-        bool Any<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
-        IFindFluent<T, T> Find<T>(Expression<Func<T, bool>> filter, FindOptions options = null) where T : IMongoEntity;
-        IFindFluent<T, T> Find<T>(FilterDefinition<T> filter, FindOptions options = null) where T : IMongoEntity;
-        T FindFirst<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
-        IEnumerable<T> FindGetResults<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
-        long Count<T>() where T : IMongoEntity;
-        long Count<T>(Expression<Func<T, bool>> filter, CountOptions options = null) where T : IMongoEntity;
-        long Count<T>(FilterDefinition<T> filter, CountOptions options = null) where T : IMongoEntity;
-        IAggregateFluent<T> Aggregate<T>(AggregateOptions options = null) where T : IMongoEntity;
-        IMongoQueryable<T> AsQueryable<T>(AggregateOptions options = null) where T : IMongoEntity;
         void InsertMany<T>(IEnumerable<T> items, InsertManyOptions options = null) where T : IMongoEntity;
         Task InsertManyAsync<T>(IEnumerable<T> items, InsertManyOptions options = null) where T : IMongoEntity;
     }
