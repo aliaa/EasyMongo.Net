@@ -23,5 +23,6 @@ namespace EasyMongoNet
         UpdateResult UpdateMany<T>(Expression<Func<T, bool>> filter, UpdateDefinition<T> update, UpdateOptions options = null) where T : IMongoEntity;
         void InsertMany<T>(IEnumerable<T> items, InsertManyOptions options = null) where T : IMongoEntity;
         Task InsertManyAsync<T>(IEnumerable<T> items, InsertManyOptions options = null) where T : IMongoEntity;
+        Func<string> GetUserNameFunc { get; set; }
     }
 }

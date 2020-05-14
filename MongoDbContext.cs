@@ -24,19 +24,19 @@ namespace EasyMongoNet
         private readonly List<CustomMongoConnection> customConnections = new List<CustomMongoConnection>();
         private readonly Dictionary<string, object> Collections = new Dictionary<string, object>();
         private readonly string dbName;
-        private readonly Func<string> getUsernameFunc;
 
         private static readonly Dictionary<Type, CollectionSaveAttribute> SaveAttrsCache = new Dictionary<Type, CollectionSaveAttribute>();
         public readonly IMongoDatabase Database;
         public bool DefaultWriteLog { get; set; } = false;
         public bool DefaultPreprocess { get; set; } = false;
+        public Func<string> GetUserNameFunc { get; set; }
 
         public MongoDbContext(string dbName, MongoClientSettings mongoClientSettings, 
             Func<string> getUsernameFunc = null, bool setDictionaryConventionToArrayOfDocuments = false, 
             IEnumerable<CustomMongoConnection> customConnections = null, IObjectSavePreprocessor objectPreprocessor = null)
         {
             this.dbName = dbName;
-            this.getUsernameFunc = getUsernameFunc;
+            this.GetUserNameFunc = getUsernameFunc;
             this.setDictionaryConventionToArrayOfDocuments = setDictionaryConventionToArrayOfDocuments;
             this.Database = GetDatabase(mongoClientSettings, dbName, setDictionaryConventionToArrayOfDocuments);
             if (customConnections != null)
@@ -205,7 +205,7 @@ namespace EasyMongoNet
             }
             if (writeLog)
             {
-                string username = getUsernameFunc();
+                string username = GetUserNameFunc();
                 if (activityType == ActivityType.Insert)
                 {
                     var insertActivity = new InsertActivity(username) { CollectionName = GetCollectionName(type), ObjId = item.Id };
@@ -226,7 +226,7 @@ namespace EasyMongoNet
             var result = GetCollection<T>().DeleteOne(t => t.Id == item.Id);
             if (ShouldWriteLog<T>())
             {
-                var deleteActivity = new DeleteActivity(getUsernameFunc()) { CollectionName = GetCollectionName(typeof(T)), ObjId = item.Id, DeletedObj = item };
+                var deleteActivity = new DeleteActivity(GetUserNameFunc()) { CollectionName = GetCollectionName(typeof(T)), ObjId = item.Id, DeletedObj = item };
                 Save((UserActivity)deleteActivity);
             }
             return result;
@@ -239,7 +239,7 @@ namespace EasyMongoNet
                 T item = FindById<T>(id);
                 if (item != null)
                 {
-                    var deleteActivity = new DeleteActivity(getUsernameFunc()) { CollectionName = GetCollectionName(typeof(T)), ObjId = item.Id, DeletedObj = item };
+                    var deleteActivity = new DeleteActivity(GetUserNameFunc()) { CollectionName = GetCollectionName(typeof(T)), ObjId = item.Id, DeletedObj = item };
                     Save((UserActivity)deleteActivity);
                 }
             }
@@ -253,7 +253,7 @@ namespace EasyMongoNet
                 T item = Find(filter).FirstOrDefault();
                 if (item != null)
                 {
-                    var deleteActivity = new DeleteActivity(getUsernameFunc()) { CollectionName = GetCollectionName(typeof(T)), ObjId = item.Id, DeletedObj = item };
+                    var deleteActivity = new DeleteActivity(GetUserNameFunc()) { CollectionName = GetCollectionName(typeof(T)), ObjId = item.Id, DeletedObj = item };
                     Save((UserActivity)deleteActivity);
                 }
             }
@@ -274,7 +274,7 @@ namespace EasyMongoNet
             var res = GetCollection<T>().UpdateOne(filter, updateDef, options);
             if (oldValue != null)
             {
-                UpdateActivity updateActivity = new UpdateActivity(getUsernameFunc()) { CollectionName = GetCollectionName(typeof(T)), ObjId = oldValue.Id };
+                UpdateActivity updateActivity = new UpdateActivity(GetUserNameFunc()) { CollectionName = GetCollectionName(typeof(T)), ObjId = oldValue.Id };
                 T newValue = FindById<T>(oldValue.Id);
                 updateActivity.SetDiff(oldValue, newValue);
                 Save((UserActivity)updateActivity);

@@ -16,6 +16,8 @@ namespace EasyMongoNet
     {
         public readonly Dictionary<Type, List<object>> Data = new Dictionary<Type, List<object>>();
 
+        public Func<string> GetUserNameFunc { get; set; }
+
         private IEnumerable<T> GetListOfType<T>()
         {
             if (!Data.ContainsKey(typeof(T)))
