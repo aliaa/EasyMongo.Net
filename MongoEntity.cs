@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace EasyMongoNet
@@ -11,6 +12,7 @@ namespace EasyMongoNet
     [Serializable]
     public class MongoEntity : IMongoEntity
     {
+        [TypeConverter(typeof(ObjectIdTypeConverter))]
         public ObjectId Id { get; set; }
     }
 }

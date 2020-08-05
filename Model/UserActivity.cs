@@ -14,14 +14,14 @@ namespace EasyMongoNet.Model
     [BsonKnownTypes(typeof(DeleteActivity), typeof(InsertActivity), typeof(UpdateActivity))]
     [CollectionIndex(new string[] { nameof(ObjId) })]
     [CollectionIndex(new string[] { nameof(Username) })]
-    public abstract class UserActivity : MongoEntity
+    public class UserActivity : MongoEntity
     {
         public string Username { get; set; }
 
         public DateTime Time { get; set; } = DateTime.Now;
 
         [BsonRepresentation(BsonType.String)]
-        public ActivityType ActivityType { get; protected set; }
+        public ActivityType ActivityType { get; set; }
 
         public string CollectionName { get; set; }
 
