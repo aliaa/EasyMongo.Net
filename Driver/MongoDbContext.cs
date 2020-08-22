@@ -130,8 +130,40 @@ namespace EasyMongoNet
                 var options = new CreateIndexOptions { Sparse = attr.Sparse, Unique = attr.Unique };
                 if (attr.ExpireAfterSeconds > 0)
                     options.ExpireAfter = new TimeSpan(attr.ExpireAfterSeconds * 10000000);
-                CreateIndexModel<T> model = new CreateIndexModel<T>(attr.GetIndexKeysDefinition<T>(), options);
+                CreateIndexModel<T> model = new CreateIndexModel<T>(GetIndexKeysDefinition<T>(attr), options);
                 collection.Indexes.CreateOne(model);
+            }
+        }
+
+        private static IndexKeysDefinition<T> GetIndexKeysDefinition<T>(CollectionIndexAttribute attr)
+        {
+            if (attr.Fields.Length == 1)
+                return GetIndexDefForOne<T>(attr.Fields[0], attr.Types != null && attr.Types.Length > 0 ? attr.Types[0] : MongoIndexType.Ascending);
+
+            List<IndexKeysDefinition<T>> list = new List<IndexKeysDefinition<T>>(attr.Fields.Length);
+            for (int i = 0; i < attr.Fields.Length; i++)
+                list.Add(GetIndexDefForOne<T>(attr.Fields[i], attr.Types != null && attr.Fields.Length > i ? attr.Types[i] : MongoIndexType.Ascending));
+            return Builders<T>.IndexKeys.Combine(list);
+        }
+
+        private static IndexKeysDefinition<T> GetIndexDefForOne<T>(string field, MongoIndexType type)
+        {
+            switch (type)
+            {
+                case MongoIndexType.Ascending:
+                    return Builders<T>.IndexKeys.Ascending(field);
+                case MongoIndexType.Descending:
+                    return Builders<T>.IndexKeys.Descending(field);
+                case MongoIndexType.Geo2D:
+                    return Builders<T>.IndexKeys.Geo2D(field);
+                case MongoIndexType.Geo2DSphere:
+                    return Builders<T>.IndexKeys.Geo2DSphere(field);
+                case MongoIndexType.Text:
+                    return Builders<T>.IndexKeys.Text(field);
+                case MongoIndexType.Hashed:
+                    return Builders<T>.IndexKeys.Hashed(field);
+                default:
+                    throw new Exception();
             }
         }
 

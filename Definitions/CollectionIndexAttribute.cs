@@ -1,5 +1,4 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 
@@ -24,12 +23,12 @@ namespace EasyMongoNet
         /// <summary>
         /// Fields to index. Usually one field should be indexed. But if you want an index with 2 or more fields, add them.
         /// </summary>
-        private string[] Fields;
+        public string[] Fields { get; set; }
 
         /// <summary>
         /// Index types for selected Fields. You can ignore types if they are "Ascending".
         /// </summary>
-        private MongoIndexType[] Types;
+        public MongoIndexType[] Types { get; set; }
 
         /// <summary>
         /// Mark true if the index should be unique.
@@ -96,36 +95,8 @@ namespace EasyMongoNet
             Types = typesList.ToArray();
         }
 
-        public IndexKeysDefinition<T> GetIndexKeysDefinition<T>()
-        {
-            if (Fields.Length == 1)
-                return GetIndexDefForOne<T>(Fields[0], Types != null && Types.Length > 0 ? Types[0] : MongoIndexType.Ascending);
+        
 
-            List<IndexKeysDefinition<T>> list = new List<IndexKeysDefinition<T>>(Fields.Length);
-            for (int i = 0; i < Fields.Length; i++)
-                list.Add(GetIndexDefForOne<T>(Fields[i], Types != null && Fields.Length > i ? Types[i] : MongoIndexType.Ascending));
-            return Builders<T>.IndexKeys.Combine(list);
-        }
-
-        private static IndexKeysDefinition<T> GetIndexDefForOne<T>(string field, MongoIndexType type)
-        {
-            switch (type)
-            {
-                case MongoIndexType.Ascending:
-                    return Builders<T>.IndexKeys.Ascending(field);
-                case MongoIndexType.Descending:
-                    return Builders<T>.IndexKeys.Descending(field);
-                case MongoIndexType.Geo2D:
-                    return Builders<T>.IndexKeys.Geo2D(field);
-                case MongoIndexType.Geo2DSphere:
-                    return Builders<T>.IndexKeys.Geo2DSphere(field);
-                case MongoIndexType.Text:
-                    return Builders<T>.IndexKeys.Text(field);
-                case MongoIndexType.Hashed:
-                    return Builders<T>.IndexKeys.Hashed(field);
-                default:
-                    throw new Exception();
-            }
-        }
+        
     }
 }

@@ -7,7 +7,7 @@ namespace EasyMongoNet.Model
     /// <summary>
     /// Represents a log to insertion job.
     /// </summary>
-    internal class InsertActivity : UserActivity
+    public class InsertActivity : UserActivity
     {
         public InsertActivity() : this(null) { }
 
