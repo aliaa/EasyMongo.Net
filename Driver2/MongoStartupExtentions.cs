@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace EasyMongoNet
 {
@@ -57,9 +59,10 @@ namespace EasyMongoNet
                     databasesDic.Add(client, db);
                 }
                 var col = GetCollecion(db, type);
-                //SetIndexes(col, type);
+                SetIndexes(col, type);
                 AddCollectionToServices(services, col, type);
             }
+            BsonSerializer.RegisterSerializationProvider(new CustomSerializationProvider());
         }
 
 
@@ -107,53 +110,60 @@ namespace EasyMongoNet
             return collectionCursor.Any();
         }
 
-        //private static void SetIndexes(object collection, Type type)
-        //{
-        //    foreach (var attr in type.GetCustomAttributes<CollectionIndexAttribute>())
-        //    {
-        //        var options = new CreateIndexOptions { Sparse = attr.Sparse, Unique = attr.Unique };
-        //        if (attr.ExpireAfterSeconds > 0)
-        //            options.ExpireAfter = new TimeSpan(attr.ExpireAfterSeconds * 10000000);
+        private static void SetIndexes(object collection, Type type)
+        {
+            foreach (var attr in type.GetCustomAttributes<CollectionIndexAttribute>())
+            {
+                var options = new CreateIndexOptions { Sparse = attr.Sparse, Unique = attr.Unique };
+                if (attr.ExpireAfterSeconds > 0)
+                    options.ExpireAfter = new TimeSpan(attr.ExpireAfterSeconds * 10000000);
 
+                var getIndexKeysMethod = typeof(MongoStartupExtentions).GetMethod(nameof(GetIndexKeysDefinition), BindingFlags.NonPublic | BindingFlags.Static)
+                    .MakeGenericMethod(type);
+                var indexKeysDef = getIndexKeysMethod.Invoke(null, new object[] { attr });
 
+                var model = typeof(CreateIndexModel<>).MakeGenericType(type).GetConstructors()[0]
+                    .Invoke(new object[] { indexKeysDef, null });
+                //var model = new CreateIndexModel(GetIndexKeysDefinition<T>(attr), options);
 
-        //        var model = new CreateIndexModel(GetIndexKeysDefinition<T>(attr), options);
-        //        var indexesProp = collection.GetType().GetProperty(nameof(IMongoCollection<object>.Indexes));
-        //        var indexManager = indexesProp.GetValue(collection);
-        //        indexManager.GetType().GetMethod(nameof(IMongoIndexManager<object>.CreateOne), new Type[] {  });
-        //    }
-        //}
+                var indexesProp = collection.GetType().GetProperty(nameof(IMongoCollection<object>.Indexes));
+                var indexManager = indexesProp.GetValue(collection);
+                var createIndexMethod = indexManager.GetType().GetMethod(nameof(IMongoIndexManager<object>.CreateOne), 
+                    new Type[] { model.GetType(), typeof(CreateOneIndexOptions), typeof(CancellationToken) });
+                createIndexMethod.Invoke(indexManager, new object[] { model, null, null });
+            }
+        }
 
-        //private static IndexKeysDefinition<T> GetIndexKeysDefinition<T>(CollectionIndexAttribute attr)
-        //{
-        //    if (attr.Fields.Length == 1)
-        //        return GetIndexDefForOne<T>(attr.Fields[0], attr.Types != null && attr.Types.Length > 0 ? attr.Types[0] : MongoIndexType.Ascending);
+        private static IndexKeysDefinition<T> GetIndexKeysDefinition<T>(CollectionIndexAttribute attr)
+        {
+            if (attr.Fields.Length == 1)
+                return GetIndexDefForOne<T>(attr.Fields[0], attr.Types != null && attr.Types.Length > 0 ? attr.Types[0] : MongoIndexType.Ascending);
 
-        //    List<IndexKeysDefinition<T>> list = new List<IndexKeysDefinition<T>>(attr.Fields.Length);
-        //    for (int i = 0; i < attr.Fields.Length; i++)
-        //        list.Add(GetIndexDefForOne<T>(attr.Fields[i], attr.Types != null && attr.Fields.Length > i ? attr.Types[i] : MongoIndexType.Ascending));
-        //    return Builders<T>.IndexKeys.Combine(list);
-        //}
+            List<IndexKeysDefinition<T>> list = new List<IndexKeysDefinition<T>>(attr.Fields.Length);
+            for (int i = 0; i < attr.Fields.Length; i++)
+                list.Add(GetIndexDefForOne<T>(attr.Fields[i], attr.Types != null && attr.Fields.Length > i ? attr.Types[i] : MongoIndexType.Ascending));
+            return Builders<T>.IndexKeys.Combine(list);
+        }
 
-        //private static IndexKeysDefinition<T> GetIndexDefForOne<T>(string field, MongoIndexType type)
-        //{
-        //    switch (type)
-        //    {
-        //        case MongoIndexType.Ascending:
-        //            return Builders<T>.IndexKeys.Ascending(field);
-        //        case MongoIndexType.Descending:
-        //            return Builders<T>.IndexKeys.Descending(field);
-        //        case MongoIndexType.Geo2D:
-        //            return Builders<T>.IndexKeys.Geo2D(field);
-        //        case MongoIndexType.Geo2DSphere:
-        //            return Builders<T>.IndexKeys.Geo2DSphere(field);
-        //        case MongoIndexType.Text:
-        //            return Builders<T>.IndexKeys.Text(field);
-        //        case MongoIndexType.Hashed:
-        //            return Builders<T>.IndexKeys.Hashed(field);
-        //        default:
-        //            throw new Exception();
-        //    }
-        //}
+        private static IndexKeysDefinition<T> GetIndexDefForOne<T>(string field, MongoIndexType type)
+        {
+            switch (type)
+            {
+                case MongoIndexType.Ascending:
+                    return Builders<T>.IndexKeys.Ascending(field);
+                case MongoIndexType.Descending:
+                    return Builders<T>.IndexKeys.Descending(field);
+                case MongoIndexType.Geo2D:
+                    return Builders<T>.IndexKeys.Geo2D(field);
+                case MongoIndexType.Geo2DSphere:
+                    return Builders<T>.IndexKeys.Geo2DSphere(field);
+                case MongoIndexType.Text:
+                    return Builders<T>.IndexKeys.Text(field);
+                case MongoIndexType.Hashed:
+                    return Builders<T>.IndexKeys.Hashed(field);
+                default:
+                    throw new Exception();
+            }
+        }
     }
 }
