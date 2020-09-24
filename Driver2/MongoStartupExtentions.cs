@@ -40,7 +40,12 @@ namespace EasyMongoNet
         {
             var customConnectionsDic = new Dictionary<string, MongoConnectionSettings>();
             if (customConnections != null)
+            {
+                foreach (var con in customConnections)
+                    if (con.ConnectionString == null)
+                        con.ConnectionString = defaultConnection.ConnectionString;
                 customConnectionsDic = customConnections.ToDictionary(k => k.Type);
+            }
             var databasesDic = new Dictionary<MongoClient, IMongoDatabase>();
             foreach (var type in entityTypes)
             {
@@ -124,7 +129,6 @@ namespace EasyMongoNet
 
                 var model = typeof(CreateIndexModel<>).MakeGenericType(type).GetConstructors()[0]
                     .Invoke(new object[] { indexKeysDef, null });
-                //var model = new CreateIndexModel(GetIndexKeysDefinition<T>(attr), options);
 
                 var indexesProp = collection.GetType().GetProperty(nameof(IMongoCollection<object>.Indexes));
                 var indexManager = indexesProp.GetValue(collection);
