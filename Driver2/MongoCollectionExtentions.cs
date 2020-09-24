@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace EasyMongoNet.Driver2
+namespace EasyMongoNet
 {
     public static class MongoCollectionExtentions
     {
