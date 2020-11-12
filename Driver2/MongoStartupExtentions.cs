@@ -67,6 +67,7 @@ namespace EasyMongoNet
                 SetIndexes(col, type);
                 AddCollectionToServices(services, col, type);
             }
+            services.AddSingleton(databasesDic.Values.ToList());
             BsonSerializer.RegisterSerializationProvider(new CustomSerializationProvider());
         }
 

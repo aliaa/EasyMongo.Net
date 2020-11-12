@@ -15,7 +15,7 @@ namespace EasyMongoNet
     {
         void Save<T>(T item) where T : IMongoEntity;
         DeleteResult DeleteOne<T>(T item) where T : IMongoEntity;
-        DeleteResult DeleteOne<T>(ObjectId id) where T : IMongoEntity;
+        DeleteResult DeleteOne<T>(string id) where T : IMongoEntity;
         DeleteResult DeleteOne<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
         DeleteResult DeleteMany<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
         UpdateResult UpdateOne<T>(Expression<Func<T, bool>> filter, UpdateDefinition<T> updateDef, UpdateOptions options = null) where T : IMongoEntity;

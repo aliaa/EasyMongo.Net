@@ -71,7 +71,7 @@ namespace EasyMongoNet
             return new DeleteResult.Acknowledged(0);
         }
 
-        public DeleteResult DeleteOne<T>(ObjectId id) where T : IMongoEntity
+        public DeleteResult DeleteOne<T>(string id) where T : IMongoEntity
         {
             T item = GetListOfType<T>().Where(t => t.Id == id).FirstOrDefault();
             if (item != null)
@@ -103,9 +103,7 @@ namespace EasyMongoNet
             throw new NotImplementedException();
         }
 
-        public T FindById<T>(ObjectId id) where T : IMongoEntity => GetListOfType<T>().FirstOrDefault(t => t.Id == id);
-
-        public T FindById<T>(string id) where T : IMongoEntity => FindById<T>(ObjectId.Parse(id));
+        public T FindById<T>(string id) where T : IMongoEntity => GetListOfType<T>().FirstOrDefault(t => t.Id == id);
 
         public T FindFirst<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity => 
             GetListOfType<T>().FirstOrDefault(filter.Compile());

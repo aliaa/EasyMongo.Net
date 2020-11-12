@@ -25,7 +25,8 @@ namespace EasyMongoNet.Model
 
         public string CollectionName { get; set; }
 
-        public ObjectId ObjId { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string ObjId { get; set; }
 
         public UserActivity() { }
 

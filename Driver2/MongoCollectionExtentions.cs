@@ -9,20 +9,14 @@ namespace EasyMongoNet
 {
     public static class MongoCollectionExtentions
     {
-        public static T FindById<T>(this IMongoCollection<T> collection, ObjectId id) where T : IMongoEntity =>
+        public static T FindById<T>(this IMongoCollection<T> collection, string id) where T : IMongoEntity =>
             collection.Find(x => x.Id == id).FirstOrDefault();
 
-        public static async Task<T> FindByIdAsync<T>(this IMongoCollection<T> collection, ObjectId id) where T : IMongoEntity
+        public static async Task<T> FindByIdAsync<T>(this IMongoCollection<T> collection, string id) where T : IMongoEntity
         {
             var cursor = await collection.FindAsync(x => x.Id == id);
             return await cursor.FirstOrDefaultAsync();
         }
-
-        public static T FindById<T>(this IMongoCollection<T> collection, string id) where T : IMongoEntity =>
-            FindById(collection, ObjectId.Parse(id));
-
-        public static async Task<T> FindByIdAsync<T>(this IMongoCollection<T> collection, string id) where T : IMongoEntity =>
-            await FindByIdAsync(collection, ObjectId.Parse(id));
 
         public static T FindFirst<T>(this IMongoCollection<T> collection, Expression<Func<T, bool>> filter) where T : IMongoEntity =>
             collection.Find(filter).FirstOrDefault();
@@ -48,10 +42,10 @@ namespace EasyMongoNet
         public static async Task<DeleteResult> DeleteOneAsync<T>(this IMongoCollection<T> collection, T item) where T : IMongoEntity =>
             await collection.DeleteOneAsync(x => x.Id == item.Id);
         
-        public static DeleteResult DeleteOne<T>(this IMongoCollection<T> collection, ObjectId id) where T : IMongoEntity =>
+        public static DeleteResult DeleteOne<T>(this IMongoCollection<T> collection, string id) where T : IMongoEntity =>
             collection.DeleteOne(x => x.Id == id);
 
-        public static async Task<DeleteResult> DeleteOneAsync<T>(this IMongoCollection<T> collection, ObjectId id) where T : IMongoEntity =>
+        public static async Task<DeleteResult> DeleteOneAsync<T>(this IMongoCollection<T> collection, string id) where T : IMongoEntity =>
             await collection.DeleteOneAsync(x => x.Id == id);
 
         public static IEnumerable<T> All<T>(this IMongoCollection<T> collection) where T : IMongoEntity =>
@@ -61,7 +55,7 @@ namespace EasyMongoNet
             (await collection.FindAsync(FilterDefinition<T>.Empty)).ToEnumerable();
 
         public static bool Any<T>(this IMongoCollection<T> collection, Expression<Func<T, bool>> filter) where T : IMongoEntity =>
-            collection.Find(filter).Project(t => t.Id).FirstOrDefault() != ObjectId.Empty;
+            collection.Find(filter).Project(t => t.Id).FirstOrDefault() != null;
 
         public static async Task<bool> AnyAsync<T>(this IMongoCollection<T> collection, Expression<Func<T, bool>> filter) where T : IMongoEntity
         {
