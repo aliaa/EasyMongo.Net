@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 
 namespace EasyMongoNet
 {
@@ -10,7 +9,8 @@ namespace EasyMongoNet
     public interface IMongoEntity
     {
         [BsonId]
-        [JsonConverter(typeof(ObjectIdJsonConverter))]
-        ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        [BsonIgnoreIfDefault]
+        string Id { get; set; }
     }
 }

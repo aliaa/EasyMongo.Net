@@ -186,14 +186,9 @@ namespace EasyMongoNet
             return writeLog;
         }
 
-        public T FindById<T>(ObjectId id) where T : IMongoEntity
-        {
-            return GetCollection<T>().Find(t => t.Id == id).FirstOrDefault();
-        }
-
         public T FindById<T>(string id) where T : IMongoEntity
         {
-            return FindById<T>(ObjectId.Parse(id));
+            return GetCollection<T>().Find(t => t.Id == id).FirstOrDefault();
         }
 
         public T FindFirst<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity
@@ -223,7 +218,7 @@ namespace EasyMongoNet
 
             ActivityType activityType;
             T oldValue = default(T);
-            if (item.Id == ObjectId.Empty)
+            if (item.Id == null)
             {
                 GetCollection<T>().InsertOne(item);
                 activityType = ActivityType.Insert;
@@ -264,7 +259,7 @@ namespace EasyMongoNet
             return result;
         }
 
-        public DeleteResult DeleteOne<T>(ObjectId id) where T : IMongoEntity
+        public DeleteResult DeleteOne<T>(string id) where T : IMongoEntity
         {
             if (ShouldWriteLog<T>())
             {
@@ -331,7 +326,7 @@ namespace EasyMongoNet
 
         public bool Any<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity
         {
-            return GetCollection<T>().Find(filter).Project(t => t.Id).FirstOrDefault() != ObjectId.Empty;
+            return GetCollection<T>().Find(filter).Project(t => t.Id).FirstOrDefault() != null;
         }
 
         public IFindFluent<T, T> Find<T>(Expression<Func<T, bool>> filter, FindOptions options = null) where T : IMongoEntity

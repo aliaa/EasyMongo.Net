@@ -9,7 +9,6 @@ namespace EasyMongoNet
 {
     public interface IReadOnlyDbContext
     {
-        T FindById<T>(ObjectId id) where T : IMongoEntity;
         T FindById<T>(string id) where T : IMongoEntity;
         IEnumerable<T> All<T>() where T : IMongoEntity;
         bool Any<T>(Expression<Func<T, bool>> filter) where T : IMongoEntity;
