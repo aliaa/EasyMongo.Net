@@ -62,5 +62,21 @@ namespace EasyMongoNet
             var cursor = await collection.FindAsync(filter, new FindOptions<T, ObjectId> { Limit = 1, Projection = Builders<T>.Projection.Include(x => x.Id) });
             return (await cursor.FirstOrDefaultAsync()) != ObjectId.Empty;
         }
+
+        public static void Save<T>(this IMongoCollection<T> collection, T item) where T : IMongoEntity
+        {
+            if (item.Id == null)
+                collection.InsertOne(item);
+            else
+                collection.ReplaceOne(t => t.Id == item.Id, item);
+        }
+
+        public static async Task SaveAsync<T>(this IMongoCollection<T> collection, T item) where T : IMongoEntity
+        {
+            if (item.Id == null)
+                await collection.InsertOneAsync(item);
+            else
+                await collection.ReplaceOneAsync(t => t.Id == item.Id, item);
+        }
     }
 }
