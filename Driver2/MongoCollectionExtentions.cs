@@ -48,11 +48,11 @@ namespace EasyMongoNet
         public static async Task<DeleteResult> DeleteOneAsync<T>(this IMongoCollection<T> collection, string id) where T : IMongoEntity =>
             await collection.DeleteOneAsync(x => x.Id == id);
 
-        public static IEnumerable<T> All<T>(this IMongoCollection<T> collection) where T : IMongoEntity =>
-            collection.Find(FilterDefinition<T>.Empty).ToEnumerable();
+        public static List<T> All<T>(this IMongoCollection<T> collection) where T : IMongoEntity =>
+            collection.Find(FilterDefinition<T>.Empty).ToList();
 
-        public static async Task<IEnumerable<T>> AllAsync<T>(this IMongoCollection<T> collection) where T : IMongoEntity =>
-            (await collection.FindAsync(FilterDefinition<T>.Empty)).ToEnumerable();
+        public static async Task<List<T>> AllAsync<T>(this IMongoCollection<T> collection) where T : IMongoEntity =>
+            await (await collection.FindAsync(FilterDefinition<T>.Empty)).ToListAsync();
 
         public static bool Any<T>(this IMongoCollection<T> collection, Expression<Func<T, bool>> filter) where T : IMongoEntity =>
             collection.Find(filter).Project(t => t.Id).FirstOrDefault() != null;
