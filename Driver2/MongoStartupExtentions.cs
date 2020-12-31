@@ -46,7 +46,7 @@ namespace EasyMongoNet
                         con.ConnectionString = defaultConnection.ConnectionString;
                 customConnectionsDic = customConnections.ToDictionary(k => k.Type);
             }
-            var databasesDic = new Dictionary<MongoClient, IMongoDatabase>();
+            var databasesDic = new Dictionary<MongoConnectionSettings, IMongoDatabase>();
             foreach (var type in entityTypes)
             {
                 MongoConnectionSettings connSettings;
@@ -54,16 +54,18 @@ namespace EasyMongoNet
                     connSettings = customConnectionsDic[type.Name];
                 else
                     connSettings = defaultConnection;
-                var client = new MongoClient(connSettings.ConnectionSettings);
                 IMongoDatabase db;
-                if (databasesDic.ContainsKey(client))
-                    db = databasesDic[client];
+                if (databasesDic.ContainsKey(connSettings))
+                    db = databasesDic[connSettings];
                 else
                 {
+                    var client = new MongoClient(connSettings.ConnectionSettings);
                     db = client.GetDatabase(connSettings.DBName);
-                    databasesDic.Add(client, db);
+                    databasesDic.Add(connSettings, db);
                 }
                 var col = GetCollecion(db, type);
+                if (col == null)
+                    continue;
                 SetIndexes(col, type);
                 AddCollectionToServices(services, col, type);
             }
@@ -74,7 +76,9 @@ namespace EasyMongoNet
 
         private static object GetCollecion(IMongoDatabase db, Type type)
         {
-            CollectionOptionsAttribute attr = (CollectionOptionsAttribute)Attribute.GetCustomAttribute(type, typeof(CollectionOptionsAttribute));
+            CollectionOptionsAttribute attr = (CollectionOptionsAttribute)Attribute.GetCustomAttribute(type, typeof(CollectionOptionsAttribute), inherit: false);
+            if (attr != null && attr.Ignore || type.IsAbstract)
+                return null;
             string collectionName = attr?.Name ?? type.Name;
             if (attr != null && !CheckCollectionExists(db, collectionName))
             {
@@ -118,7 +122,7 @@ namespace EasyMongoNet
 
         private static void SetIndexes(object collection, Type type)
         {
-            foreach (var attr in type.GetCustomAttributes<CollectionIndexAttribute>())
+            foreach (var attr in type.GetCustomAttributes<CollectionIndexAttribute>(inherit: true))
             {
                 var options = new CreateIndexOptions { Sparse = attr.Sparse, Unique = attr.Unique };
                 if (attr.ExpireAfterSeconds > 0)

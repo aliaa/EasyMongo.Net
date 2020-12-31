@@ -9,6 +9,11 @@ namespace EasyMongoNet
     public class CollectionOptionsAttribute : Attribute
     {
         /// <summary>
+        /// Set true to ignore automatic collection creation.
+        /// </summary>
+        public bool Ignore { get; set; }
+
+        /// <summary>
         /// Set special name of collection if you don't want to be same as model name.
         /// </summary>
         public string Name { get; set; }

@@ -18,5 +18,7 @@ namespace EasyMongoNet
                 ConnectionSettings = MongoClientSettings.FromConnectionString(value);
             }
         }
+
+        public override int GetHashCode() => ConnectionString?.GetHashCode() ?? 0 ^ Type?.GetHashCode() ?? 0 ^ DBName?.GetHashCode() ?? 0;
     }
 }

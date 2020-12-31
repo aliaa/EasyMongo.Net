@@ -59,8 +59,8 @@ namespace EasyMongoNet
 
         public static async Task<bool> AnyAsync<T>(this IMongoCollection<T> collection, Expression<Func<T, bool>> filter) where T : IMongoEntity
         {
-            var cursor = await collection.FindAsync(filter, new FindOptions<T, ObjectId> { Limit = 1, Projection = Builders<T>.Projection.Include(x => x.Id) });
-            return (await cursor.FirstOrDefaultAsync()) != ObjectId.Empty;
+            var cursor = await collection.FindAsync(filter, new FindOptions<T, BsonDocument> { Limit = 1, Projection = Builders<T>.Projection.Include(x => x.Id) });
+            return (await cursor.FirstOrDefaultAsync()) != null;
         }
 
         public static void Save<T>(this IMongoCollection<T> collection, T item) where T : IMongoEntity
